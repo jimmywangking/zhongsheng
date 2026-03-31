@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM 总裁驾驶舱 - Executive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #111633;
+            --bg-card: rgba(17, 22, 51, 0.85);
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7b2cbf;
+            --accent-success: #00ff88;
+            --accent-warning: #ffb700;
+            --accent-danger: #ff4757;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --border-color: rgba(0, 212, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: radial-gradient(ellipse at top, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 3840px;
+            margin: 0 auto;
+            padding: 15px;
+            height: calc(100vh - 30px);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 标题栏 */
+        header {
+            background: linear-gradient(135deg, rgba(17, 22, 51, 0.9) 0%, rgba(10, 14, 39, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .header-left .subtitle {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .time-display { text-align: right; }
+        .time-display .date { color: var(--accent-primary); font-size: 16px; font-weight: 600; }
+        .time-display .time { color: var(--text-secondary); font-size: 12px; }
+
+        #syncBtn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        #syncBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        /* KPI 卡片 */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .kpi-card:nth-child(1)::before { background: linear-gradient(180deg, #00d4ff 0%, #7b2cbf 100%); }
+        .kpi-card:nth-child(2)::before { background: linear-gradient(180deg, #00ff88 0%, #00d4ff 100%); }
+        .kpi-card:nth-child(3)::before { background: linear-gradient(180deg, #ffd700 0%, #ffed4e 100%); }
+        .kpi-card:nth-child(4)::before { background: linear-gradient(180deg, #ff6b6b 0%, #ff4757 100%); }
+        .kpi-card:nth-child(5)::before { background: linear-gradient(180deg, #a0aec0 0%, #718096 100%); }
+
+        .kpi-icon { font-size: 26px; margin-bottom: 10px; opacity: 0.9; }
+        .kpi-card:nth-child(1) .kpi-icon { color: #00d4ff; }
+        .kpi-card:nth-child(2) .kpi-icon { color: #00ff88; }
+        .kpi-card:nth-child(3) .kpi-icon { color: #ffd700; }
+        .kpi-card:nth-child(4) .kpi-icon { color: #ff4757; }
+        .kpi-card:nth-child(5) .kpi-icon { color: #a0aec0; }
+
+        .kpi-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; }
+        .kpi-value { font-size: 28px; font-weight: 700; margin-bottom: 5px; color: var(--text-primary); }
+        .kpi-sub { font-size: 11px; color: var(--text-muted); }
+        .kpi-sub strong { color: var(--accent-success); font-weight: 600; }
+
+        /* 主内容区 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chart-card.wide { grid-column: span 2; }
+        .chart-card.tall { grid-row: span 2; }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-title i {
+            font-size: 18px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .chart-container {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+        }
+
+        /* 表格 */
+        .table-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-primary);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 10px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        tr:hover td { background: rgba(0, 212, 255, 0.05); }
+
+        .amount { color: var(--accent-success); font-weight: 600; font-size: 13px; }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32 0%, #e8a87c 100%); color: #000; }
+        .rank-other { background: rgba(255, 255, 255, 0.1); color: var(--text-secondary); }
+
+        /* 滚动条 */
+        .table-wrapper::-webkit-scrollbar { width: 6px; }
+        .table-wrapper::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .table-wrapper::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #00d4ff 0%, #7b2cbf 100%); }
+
+        /* 响应式 */
+        @media (max-width: 2560px) {
+            .kpi-grid { grid-template-columns: repeat(5, 1fr); }
+            .main-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: auto; }
+            .chart-card.wide { grid-column: span 2; }
+            .chart-card.tall { grid-row: span 1; }
+        }
+
+        @media (max-width: 1920px) {
+            .kpi-grid { grid-template-columns: repeat(5, 1fr); }
+            .main-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-chart-line"></i> CRM 总裁驾驶舱</h1>
+                <div class="subtitle">Executive Dashboard · 实时经营数据监控</div>
+            </div>
+            <div class="header-right">
+                <div class="time-display">
+                    <div class="date" id="currentDate">--</div>
+                    <div class="time" id="currentTime">--</div>
+                </div>
+                <button onclick="triggerSync()" id="syncBtn"><i class="fas fa-sync-alt"></i> 同步数据</button>
+            </div>
+        </header>
+
+        <!-- KPI 指标卡片 -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="kpi-label">合同总数</div>
+                <div class="kpi-value" id="totalContracts">0</div>
+                <div class="kpi-sub">今日：<strong id="todayContracts">0</strong> 条</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fas fa-yen-sign"></i></div>
+                <div class="kpi-label">合同总金额</div>
+                <div class="kpi-value" id="totalAmount">¥0</div>
+                <div class="kpi-sub">今日：<strong id="todayAmount">¥0</strong></div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="kpi-label">回款率</div>
+                <div class="kpi-value" id="paymentRate">0%</div>
+                <div class="kpi-sub">已回：<strong id="totalPaid">¥0</strong></div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                <div class="kpi-label">客户总数</div>
+                <div class="kpi-value" id="totalCustomers">0</div>
+                <div class="kpi-sub">独立客户</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fas fa-box"></i></div>
+                <div class="kpi-label">产品总数</div>
+                <div class="kpi-value" id="totalProducts">0</div>
+                <div class="kpi-sub">产品种类</div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-grid">
+            <!-- 销售趋势 -->
+            <div class="chart-card wide">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-chart-area"></i> 销售趋势</div>
+                </div>
+                <div id="trendChart" class="chart-container"></div>
+            </div>
+
+            <!-- 商品销量 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-fire"></i> 商品销量</div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>排名</th><th>商品</th><th>销量</th></tr></thead>
+                        <tbody id="productSalesTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 商品收益 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-coins"></i> 商品收益</div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>排名</th><th>商品</th><th>收益</th></tr></thead>
+                        <tbody id="productRevenueTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 省份分布 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-map-marked-alt"></i> 省份分布</div>
+                </div>
+                <div id="provinceChart" class="chart-container"></div>
+            </div>
+
+            <!-- 渠道分析 -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-store"></i> 渠道分析</div>
+                </div>
+                <div id="channelChart" class="chart-container"></div>
+            </div>
+
+            <!-- 客户价值排行 -->
+            <div class="chart-card wide tall">
+                <div class="chart-header">
+                    <div class="chart-title"><i class="fas fa-crown"></i> 客户价值 Top10</div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>排名</th><th>客户</th><th>合同</th><th>金额</th></tr></thead>
+                        <tbody id="customerTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatMoney(amount) {
+            if (!amount) return '¥0';
+            return '¥' + parseFloat(amount).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+        }
+
+        function formatPercent(value) {
+            if (!value) return '0%';
+            return parseFloat(value).toFixed(2) + '%';
+        }
+
+        function formatNumber(num) {
+            if (!num) return '0';
+            return num.toLocaleString('zh-CN');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/dashboard/stats');
+                const data = await response.json();
+
+                document.getElementById('totalContracts').textContent = formatNumber(data.totalContracts);
+                document.getElementById('totalAmount').textContent = formatMoney(data.totalAmount);
+                document.getElementById('paymentRate').textContent = formatPercent(data.paymentStats?.paymentRate);
+                document.getElementById('totalPaid').textContent = formatMoney(data.paymentStats?.totalPaid);
+                document.getElementById('totalCustomers').textContent = formatNumber(data.totalCustomers);
+                document.getElementById('totalProducts').textContent = formatNumber(data.totalProducts || 0);
+                document.getElementById('todayContracts').textContent = formatNumber(data.todayContracts);
+                document.getElementById('todayAmount').textContent = formatMoney(data.todayAmount);
+
+                updateTrendChart(data.trendData);
+                updateProvinceChart(data.customerRanks);
+                updateChannelChart(data.customerRanks);
+                updateProductSalesTable(data.products);
+                updateProductRevenueTable(data.products);
+                updateCustomerTable(data.customerRanks);
+                updateTime();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        function updateTrendChart(trendData) {
+            const chart = echarts.init(document.getElementById('trendChart'));
+            const option = {
+                tooltip: { trigger: 'axis', backgroundColor: 'rgba(10,14,39,0.9)', borderColor: '#00d4ff', textStyle: { color: '#fff' } },
+                legend: { data: ['合同数量', '合同金额'], textStyle: { color: '#a0aec0', fontSize: 11 }, top: 0 },
+                grid: { left: '3%', right: '4%', bottom: '3%', top: '20%', containLabel: true },
+                xAxis: { type: 'category', boundaryGap: false, data: trendData?.map(item => item.date.substring(5)) || [], axisLabel: { color: '#718096', fontSize: 10 } },
+                yAxis: [
+                    { type: 'value', axisLabel: { color: '#718096', fontSize: 10 }, splitLine: { lineStyle: { color: 'rgba(0,212,255,0.1)' } } },
+                    { type: 'value', axisLabel: { color: '#718096', fontSize: 10, formatter: v => '¥' + (v/10000).toFixed(0) + '万' }, splitLine: { lineStyle: { color: 'rgba(0,212,255,0.1)' } } }
+                ],
+                series: [
+                    { name: '合同数量', type: 'line', smooth: true, data: trendData?.map(item => item.count) || [], itemStyle: { color: '#00d4ff' }, lineStyle: { width: 2 }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0,color:'rgba(0,212,255,0.4)'},{offset:1,color:'rgba(0,212,255,0.05)'}]) } },
+                    { name: '合同金额', type: 'line', smooth: true, yAxisIndex: 1, data: trendData?.map(item => parseFloat(item.amount)||0) || [], itemStyle: { color: '#00ff88' }, lineStyle: { width: 2 }, areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0,color:'rgba(0,255,136,0.4)'},{offset:1,color:'rgba(0,255,136,0.05)'}]) } }
+                ]
+            };
+            chart.setOption(option);
+        }
+
+        function updateProvinceChart(customerRanks) {
+            const chart = echarts.init(document.getElementById('provinceChart'));
+            const provinceData = {};
+            customerRanks?.forEach(customer => {
+                const name = customer.customerName;
+                if (name.includes('广东')) provinceData['广东'] = (provinceData['广东']||0) + customer.totalAmount;
+                else if (name.includes('北京')) provinceData['北京'] = (provinceData['北京']||0) + customer.totalAmount;
+                else if (name.includes('上海')) provinceData['上海'] = (provinceData['上海']||0) + customer.totalAmount;
+                else if (name.includes('江苏')) provinceData['江苏'] = (provinceData['江苏']||0) + customer.totalAmount;
+                else if (name.includes('浙江')) provinceData['浙江'] = (provinceData['浙江']||0) + customer.totalAmount;
+                else if (name.includes('四川')) provinceData['四川'] = (provinceData['四川']||0) + customer.totalAmount;
+                else if (name.includes('湖北')) provinceData['湖北'] = (provinceData['湖北']||0) + customer.totalAmount;
+                else if (name.includes('山东')) provinceData['山东'] = (provinceData['山东']||0) + customer.totalAmount;
+                else if (name.includes('河南')) provinceData['河南'] = (provinceData['河南']||0) + customer.totalAmount;
+                else if (name.includes('福建')) provinceData['福建'] = (provinceData['福建']||0) + customer.totalAmount;
+                else provinceData['其他'] = (provinceData['其他']||0) + customer.totalAmount;
+            });
+            const sortedData = Object.entries(provinceData).sort((a,b)=>b[1]-a[1]).slice(0,10).map(item => ({name:item[0], value:item[1]}));
+            const total = sortedData.reduce((sum,item)=>sum+item.value,0);
+            const option = {
+                tooltip: { 
+                    trigger: 'item', 
+                    backgroundColor: 'rgba(10,14,39,0.9)', 
+                    borderColor: '#00d4ff', 
+                    textStyle: { color: '#fff' },
+                    formatter: '{b}: ¥{c} ({d}%)'
+                },
+                legend: { 
+                    orient: 'vertical', 
+                    right: 5, 
+                    top: 'middle',
+                    textStyle: { color: '#a0aec0', fontSize: 10 },
+                    itemWidth: 10,
+                    itemHeight: 10
+                },
+                series: [{ 
+                    type: 'pie', 
+                    radius: ['35%', '70%'], 
+                    center: ['35%','50%'],
+                    data: sortedData, 
+                    label: { 
+                        show: true,
+                        color: '#fff', 
+                        fontSize: 10,
+                        formatter: '{d}%'
+                    },
+                    labelLine: {
+                        show: true,
+                        length: 8,
+                        length2: 5,
+                        lineStyle: { color: 'rgba(255,255,255,0.3)' }
+                    },
+                    color: ['#00d4ff','#7b2cbf','#00ff88','#ffb700','#ff4757','#3498db','#e74c3c','#95a5a6','#f39c12','#1abc9c'] 
+                }]
+            };
+            chart.setOption(option);
+        }
+
+        function updateChannelChart(customerRanks) {
+            const chart = echarts.init(document.getElementById('channelChart'));
+            
+            // 从客户名称中提取渠道信息
+            const channelData = {
+                '线上渠道': 0,
+                '线下门店': 0,
+                '小程序': 0,
+                '山姆会员': 0,
+                '企业客户': 0,
+                '其他': 0
+            };
+            
+            customerRanks?.forEach(customer => {
+                const name = customer.customerName;
+                const amount = customer.totalAmount;
+                
+                if (name.includes('小程序')) channelData['小程序'] += amount;
+                else if (name.includes('山姆')) channelData['山姆会员'] += amount;
+                else if (name.includes('线上')) channelData['线上渠道'] += amount;
+                else if (name.includes('博世') || name.includes('西门子') || name.includes('美诺')) channelData['企业客户'] += amount;
+                else if (name.includes('店') || name.includes('城')) channelData['线下门店'] += amount;
+                else channelData['其他'] += amount;
+            });
+            
+            const sortedData = Object.entries(channelData)
+                .filter(item => item[1] > 0)
+                .sort((a,b)=>b[1]-a[1])
+                .map(item => ({name:item[0], value:item[1]}));
+            
+            const option = {
+                tooltip: { 
+                    trigger: 'item', 
+                    backgroundColor: 'rgba(10,14,39,0.9)', 
+                    borderColor: '#00d4ff', 
+                    textStyle: { color: '#fff' },
+                    formatter: '{b}: ¥{c} ({d}%)'
+                },
+                legend: { 
+                    orient: 'vertical', 
+                    right: 5, 
+                    top: 'middle',
+                    textStyle: { color: '#a0aec0', fontSize: 10 },
+                    itemWidth: 10,
+                    itemHeight: 10
+                },
+                series: [{ 
+                    type: 'pie', 
+                    radius: ['35%', '70%'], 
+                    center: ['35%','50%'],
+                    data: sortedData, 
+                    label: { 
+                        show: true,
+                        color: '#fff', 
+                        fontSize: 10,
+                        formatter: '{d}%'
+                    },
+                    labelLine: {
+                        show: true,
+                        length: 8,
+                        length2: 5,
+                        lineStyle: { color: 'rgba(255,255,255,0.3)' }
+                    },
+                    color: ['#00d4ff','#7b2cbf','#00ff88','#ffb700','#ff4757','#3498db'] 
+                }]
+            };
+            chart.setOption(option);
+        }
+
+        function updateProductSalesTable(products) {
+            const tbody = document.getElementById('productSalesTable');
+            const sorted = [...(products||[])].sort((a,b)=>b.quantity-a.quantity).slice(0,10);
+            tbody.innerHTML = sorted.map((item,i)=>{
+                let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode}</td><td style="font-weight:600;">${item.quantity}</td></tr>`;
+            }).join('')||'<tr><td colspan="3" style="text-align:center;color:#718096;">暂无数据</td></tr>';
+        }
+
+        function updateProductRevenueTable(products) {
+            const tbody = document.getElementById('productRevenueTable');
+            const sorted = [...(products||[])].sort((a,b)=>b.totalPrice-a.totalPrice).slice(0,10);
+            tbody.innerHTML = sorted.map((item,i)=>{
+                let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode}</td><td class="amount">${formatMoney(item.totalPrice)}</td></tr>`;
+            }).join('')||'<tr><td colspan="3" style="text-align:center;color:#718096;">暂无数据</td></tr>';
+        }
+
+        function updateCustomerTable(customerRanks) {
+            const tbody = document.getElementById('customerTable');
+            tbody.innerHTML = customerRanks?.map((item,i)=>{
+                let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+                const name = item.customerName.length>12?item.customerName.substring(0,12)+'...':item.customerName;
+                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${name}</td><td>${item.contractCount||1}</td><td class="amount">${formatMoney(item.totalAmount)}</td></tr>`;
+            }).join('')||'<tr><td colspan="4" style="text-align:center;color:#718096;">暂无数据</td></tr>';
+        }
+
+        async function triggerSync() {
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+            try {
+                const response = await fetch('/api/sync-logs/trigger', {method:'POST'});
+                const result = await response.json();
+                if (result.code===200) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> 成功';
+                    setTimeout(()=>{loadDashboard();btn.innerHTML='<i class="fas fa-sync-alt"></i> 同步数据';btn.disabled=false;},2000);
+                }
+            } catch(error) {
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> 同步数据';
+                btn.disabled = false;
+            }
+        }
+
+        loadDashboard();
+        setInterval(loadDashboard, 30000);
+        window.addEventListener('resize', ()=>{
+            echarts.getInstanceByDom(document.getElementById('trendChart'))?.resize();
+            echarts.getInstanceByDom(document.getElementById('provinceChart'))?.resize();
+            echarts.getInstanceByDom(document.getElementById('channelChart'))?.resize();
+        });
+    </script>
+</body>
+</html>

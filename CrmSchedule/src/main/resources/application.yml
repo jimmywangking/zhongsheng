@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: crm-schedule
+  datasource:
+    driver-class-name: org.h2.Driver
+    # H2 内存模式，数据在内存中，重启后清空
+    url: jdbc:h2:mem:crm_schedule;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+  # H2 控制台配置（开发环境使用）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  # 初始化数据库脚本
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema-h2.sql
+      continue-on-error: false
+
+server:
+  port: 9001
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.git.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  config: classpath:crm-logback.xml
+  file:
+    path: ./logs
+  level:
+    com.git: debug
+    com.baomidou.mybatisplus: debug
+    org.h2: info
+
+# CRM API 配置
+crm:
+  api:
+    id: 76643
+    secret-id: mtgDfQzJIglO
+    secret-key: 4eb15289-0476-421e-aff7-bcfe68f7660b
+    url: https://crmapi.jzsoft.cn/apigetdata.aspx
+    datatype: "150"
+  # 定时任务配置 (每 1 小时执行一次)
+  task:
+    cron: 0 0 * * * ?        # 每小时整点执行
+    # 查询日期类型：all-所有，today-当天，yesterday-昨天，custom-自定义
+    query-date-type: all
+    # 自定义日期格式 yyyy-MM-dd (当 query-date-type 为 custom 时使用)
+    custom-date: ""
+
+# Excel 导出配置
+excel:
+  template:
+    path: ./template.xlsx
+  file:
+    path: ./export/
+
+# Jasypt 配置加密配置 (可选，用于加密敏感配置)
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD:crm-schedule-secret}

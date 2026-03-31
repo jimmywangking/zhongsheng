@@ -1,0 +1,237 @@
+{
+    "time": "2026-03-28 13:07:18",
+    "success": true,
+    "errcode": "0",
+    "errmsg": "",
+    "totalCount": "4",
+    "page": "1",
+    "pageSize": "10",
+    "dataname": {
+        "ht_id": "ID",
+        "ht_customerid": "对应客户",
+        "ht_date": "签单日期",
+        "ht_preside": "所有者",
+        "ht_state": "状态",
+        "ht_summoney": "总金额",
+        "ht_title": "主题",
+        "ht_number": "合同单号",
+        "ht_lxrid": "对应联系人",
+        "ht_lxrinfo": "联系方式",
+        "ht_xshid": "对应机会",
+        "ht_type": "分类",
+        "ht_paymode": "付款方式",
+        "ht_begindate": "开始日期",
+        "ht_moneyzhekou": "优惠折扣率",
+        "ht_kjmoney": "优惠抹零金额",
+        "ht_fjmoneylx": "附加费用分类",
+        "ht_fjmoney": "附加费用金额",
+        "ht_summemo": "外币备注",
+        "ht_enddate": "最晚发货/结束日期",
+        "ht_wuliutype": "发货方式",
+        "ht_yunfeimoney": "预计运费",
+        "fahuoaddressid": "收货地址",
+        "ht_contract": "合同正文",
+        "ht_remark": "备注",
+        "shenhestate": "审核状态",
+        "data_userid": "创建人"
+    },
+    "ccc": 4,
+    "data": [
+        {
+            "detail": {
+                "ht_id": "10319",
+                "ht_customerid": {
+                    "title": "王媛媛",
+                    "id": "6761",
+                    "number": "KHZL2026032308"
+                },
+                "ht_date": "2026/3/27 0:00:00",
+                "ht_preside": {
+                    "title": "卞经理",
+                    "id": "1",
+                    "number": "18",
+                    "deptid": 39
+                },
+                "ht_state": "执行中",
+                "ht_summoney": "1200.0000",
+                "ht_title": "自动主题-如意54654654",
+                "ht_number": "HTDDA00062",
+                "ht_lxrid": "王媛媛",
+                "ht_lxrinfo": "1667542159",
+                "ht_xshid": {
+                    "title": "",
+                    "id": "0",
+                    "number": ""
+                },
+                "ht_type": "",
+                "ht_paymode": "",
+                "ht_begindate": "2026/3/27 0:00:00",
+                "ht_moneyzhekou": "100.0000",
+                "ht_kjmoney": "0.0000",
+                "ht_fjmoneylx": "茶水费1111",
+                "ht_fjmoney": "0.0000",
+                "ht_summemo": "",
+                "ht_enddate": "",
+                "ht_wuliutype": "",
+                "ht_yunfeimoney": "0.0000",
+                "fahuoaddressid": "",
+                "ht_contract": "",
+                "ht_remark": "",
+                "shenhestate": "",
+                "data_userid": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                }
+            }
+        },
+        {
+            "detail": {
+                "ht_id": "10320",
+                "ht_customerid": {
+                    "title": "测试20260327",
+                    "id": "6763",
+                    "number": "KHZL2026032701"
+                },
+                "ht_date": "2026/3/27 0:00:00",
+                "ht_preside": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                },
+                "ht_state": "执行中",
+                "ht_summoney": "12000.0000",
+                "ht_title": "自动主题-如意54654654",
+                "ht_number": "HTDDA00063",
+                "ht_lxrid": "11",
+                "ht_lxrinfo": "",
+                "ht_xshid": {
+                    "title": "",
+                    "id": "0",
+                    "number": ""
+                },
+                "ht_type": "",
+                "ht_paymode": "",
+                "ht_begindate": "2026/3/27 0:00:00",
+                "ht_moneyzhekou": "100.0000",
+                "ht_kjmoney": "0.0000",
+                "ht_fjmoneylx": "茶水费1111",
+                "ht_fjmoney": "0.0000",
+                "ht_summemo": "",
+                "ht_enddate": "",
+                "ht_wuliutype": "",
+                "ht_yunfeimoney": "0.0000",
+                "fahuoaddressid": "11，青岛市",
+                "ht_contract": "",
+                "ht_remark": "",
+                "shenhestate": "",
+                "data_userid": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                }
+            }
+        },
+        {
+            "detail": {
+                "ht_id": "10321",
+                "ht_customerid": {
+                    "title": "测试8745745612",
+                    "id": "6764",
+                    "number": "KHZL2026032702"
+                },
+                "ht_date": "2026/3/27 0:00:00",
+                "ht_preside": {
+                    "title": "卞卫刚",
+                    "id": "18",
+                    "number": "5",
+                    "deptid": 0
+                },
+                "ht_state": "结束",
+                "ht_summoney": "12000.0000",
+                "ht_title": "自动主题-定制产品",
+                "ht_number": "HTDDA00064",
+                "ht_lxrid": "33",
+                "ht_lxrinfo": "",
+                "ht_xshid": {
+                    "title": "",
+                    "id": "0",
+                    "number": ""
+                },
+                "ht_type": "",
+                "ht_paymode": "现金测试修改",
+                "ht_begindate": "2026/3/27 0:00:00",
+                "ht_moneyzhekou": "100.0000",
+                "ht_kjmoney": "0.0000",
+                "ht_fjmoneylx": "茶水费1111",
+                "ht_fjmoney": "0.0000",
+                "ht_summemo": "",
+                "ht_enddate": "",
+                "ht_wuliutype": "云聚物流",
+                "ht_yunfeimoney": "0.0000",
+                "fahuoaddressid": "33，北京市海淀区中关村大街18号B座16层1601室",
+                "ht_contract": "",
+                "ht_remark": "",
+                "shenhestate": "",
+                "data_userid": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                }
+            }
+        },
+        {
+            "detail": {
+                "ht_id": "10322",
+                "ht_customerid": {
+                    "title": "测试8745745612",
+                    "id": "6764",
+                    "number": "KHZL2026032702"
+                },
+                "ht_date": "2026/3/27 0:00:00",
+                "ht_preside": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                },
+                "ht_state": "结束",
+                "ht_summoney": "3000.0000",
+                "ht_title": "自动主题-1111111",
+                "ht_number": "HTDDA00065",
+                "ht_lxrid": "33",
+                "ht_lxrinfo": "",
+                "ht_xshid": {
+                    "title": "",
+                    "id": "0",
+                    "number": ""
+                },
+                "ht_type": "",
+                "ht_paymode": "",
+                "ht_begindate": "2026/3/27 0:00:00",
+                "ht_moneyzhekou": "100.0000",
+                "ht_kjmoney": "0.0000",
+                "ht_fjmoneylx": "茶水费1111",
+                "ht_fjmoney": "0.0000",
+                "ht_summemo": "",
+                "ht_enddate": "",
+                "ht_wuliutype": "",
+                "ht_yunfeimoney": "0.0000",
+                "fahuoaddressid": "",
+                "ht_contract": "",
+                "ht_remark": "",
+                "shenhestate": "",
+                "data_userid": {
+                    "title": "金智CRM--墨岩",
+                    "id": "94",
+                    "number": "",
+                    "deptid": 1
+                }
+            }
+        }
+    ]
+}

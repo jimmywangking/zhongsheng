@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill *)",
+      "Bash(sleep *)",
+      "Bash(/opt/local/bin/mvn *)",
+      "Bash(java *)",
+      "Bash(curl *)",
+      "Bash(python3 *)"
+    ]
+  }
+}

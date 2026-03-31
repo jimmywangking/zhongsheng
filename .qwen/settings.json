@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pkill *)",
+      "Bash(sleep *)",
+      "Bash(/opt/local/bin/mvn *)",
+      "Bash(java *)",
+      "Bash(curl *)",
+      "Bash(python3 *)",
+      "Bash(sed *)",
+      "Bash(nohup *)",
+      "Bash(rm *)",
+      "Bash(date *)"
+    ]
+  },
+  "$version": 3
+}
