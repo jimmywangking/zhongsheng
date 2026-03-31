@@ -77,6 +77,16 @@ public class DashboardStats {
     private List<ProductStat> products;
 
     /**
+     * 数据起始日期
+     */
+    private String dataStartDate;
+
+    /**
+     * 最后更新时间
+     */
+    private String lastUpdateTime;
+
+    /**
      * 合同状态计数
      */
     @Data
@@ -118,6 +128,7 @@ public class DashboardStats {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ProductStat {
+        private String productId;
         private String productName;
         private String productCode;
         private Integer quantity;

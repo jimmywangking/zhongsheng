@@ -43,7 +43,7 @@ public class SyncTaskJob {
     private final ContractProductService contractProductService;
     private final SyncLogService syncLogService;
 
-    @Value("${crm.task.cron:0 0/10 * * * ?}")
+    @Value("${crm.task.cron:0 0 * * * ?}")
     private String cronExpression;
 
     @Value("${crm.task.query-date-type:today}")
@@ -55,7 +55,7 @@ public class SyncTaskJob {
     /**
      * 定时执行同步任务
      */
-    @Scheduled(cron = "${crm.task.cron:0 0/10 * * * ?}")
+    @Scheduled(cron = "${crm.task.cron:0 0 * * * ?}")
     public void execute() {
         log.info("============= CRM Sync Task Start =============");
         LocalDateTime startTime = LocalDateTime.now();
@@ -99,17 +99,17 @@ public class SyncTaskJob {
     }
 
     /**
-     * 同步合同列表（查询最近 10 天数据）
+     * 同步合同列表（查询最近 90 天数据）
      */
     private List<String> syncContractList() {
         List<String> contractIds = new ArrayList<>();
         int page = 1;
         int totalPage = 0;
 
-        // 获取 10 天前的日期和今天
-        String startDate = LocalDate.now().minusDays(10).format(DATE_FORMATTER);
+        // 获取 90 天前的日期和今天
+        String startDate = LocalDate.now().minusDays(90).format(DATE_FORMATTER);
         String endDate = LocalDate.now().format(DATE_FORMATTER);
-        log.info("======== 查询最近 10 天合同数据，ht_date >= {} ========", startDate);
+        log.info("======== 查询最近 90 天合同数据，ht_date >= {} ========", startDate);
 
         JSONObject result = crmApiClient.getContractListByStartDate(page, startDate, PAGE_SIZE);
 
@@ -124,7 +124,7 @@ public class SyncTaskJob {
             // 处理第一页数据
             JSONArray dataArray = result.getJSONArray("data");
             if (dataArray != null && !dataArray.isEmpty()) {
-                // API 已返回 addtime 在最近 10 天的数据，直接保存
+                // API 已返回 addtime 在最近 90 天的数据，直接保存
                 List<Contract> contracts = CovertUtil.jsonToContractList(dataArray);
                 contractService.batchSaveOrUpdate(contracts);
                 extractContractIds(dataArray, contractIds);
@@ -147,7 +147,7 @@ public class SyncTaskJob {
             }
         }
 
-        log.info("======== 合同列表同步完成，共获取 {} 个合同 ID（最近 10 天） ========", contractIds.size());
+        log.info("======== 合同列表同步完成，共获取 {} 个合同 ID（最近 90 天） ========", contractIds.size());
         return contractIds;
     }
 
@@ -159,11 +159,11 @@ public class SyncTaskJob {
             .filter(c -> {
                 // 列表 API 返回的数据中没有 addtime，使用 ht_date
                 String date = c.getHtDate();
-                if (date == null || date.length() < 10) {
+                if (date == null || date.length() < 90) {
                     return false;
                 }
                 // 提取日期部分（去掉时间）
-                date = date.substring(0, 10);
+                date = date.substring(0, 90);
                 return date.compareTo(startDate) >= 0 && date.compareTo(endDate) <= 0;
             })
             .collect(Collectors.toList());

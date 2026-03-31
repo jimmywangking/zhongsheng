@@ -75,6 +75,34 @@
             gap: 20px;
         }
 
+        .header-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .data-range {
+            display: flex;
+            gap: 25px;
+            padding: 8px 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .data-range span {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .data-range strong {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
         .time-display { text-align: right; }
         .time-display .date { color: var(--accent-primary); font-size: 16px; font-weight: 600; }
         .time-display .time { color: var(--text-secondary); font-size: 12px; }
@@ -273,6 +301,12 @@
                 <h1><i class="fas fa-chart-line"></i> CRM 总裁驾驶舱</h1>
                 <div class="subtitle">Executive Dashboard · 实时经营数据监控</div>
             </div>
+            <div class="header-center">
+                <div class="data-range">
+                    <span><i class="fas fa-calendar-alt"></i> 数据起始：<strong id="dataStartDate">--</strong></span>
+                    <span><i class="fas fa-clock"></i> 最后更新：<strong id="lastUpdateTime">--</strong></span>
+                </div>
+            </div>
             <div class="header-right">
                 <div class="time-display">
                     <div class="date" id="currentDate">--</div>
@@ -422,6 +456,10 @@
                 document.getElementById('totalProducts').textContent = formatNumber(data.totalProducts || 0);
                 document.getElementById('todayContracts').textContent = formatNumber(data.todayContracts);
                 document.getElementById('todayAmount').textContent = formatMoney(data.todayAmount);
+
+                // 更新数据起始日期和最后更新时间
+                document.getElementById('dataStartDate').textContent = data.dataStartDate || '--';
+                document.getElementById('lastUpdateTime').textContent = data.lastUpdateTime || '--';
 
                 updateTrendChart(data.trendData);
                 updateProvinceChart(data.customerRanks);
@@ -586,7 +624,7 @@
             const sorted = [...(products||[])].sort((a,b)=>b.quantity-a.quantity).slice(0,10);
             tbody.innerHTML = sorted.map((item,i)=>{
                 let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode}</td><td style="font-weight:600;">${item.quantity}</td></tr>`;
+                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode||item.productId||'N/A'}</td><td style="font-weight:600;">${item.quantity}</td></tr>`;
             }).join('')||'<tr><td colspan="3" style="text-align:center;color:#718096;">暂无数据</td></tr>';
         }
 
@@ -595,7 +633,7 @@
             const sorted = [...(products||[])].sort((a,b)=>b.totalPrice-a.totalPrice).slice(0,10);
             tbody.innerHTML = sorted.map((item,i)=>{
                 let medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode}</td><td class="amount">${formatMoney(item.totalPrice)}</td></tr>`;
+                return `<tr><td><span class="rank-badge rank-${i<3?(i+1):'other'}">${medal}</span></td><td>${item.productName||item.productCode||item.productId||'N/A'}</td><td class="amount">${formatMoney(item.totalPrice)}</td></tr>`;
             }).join('')||'<tr><td colspan="3" style="text-align:center;color:#718096;">暂无数据</td></tr>';
         }
 
